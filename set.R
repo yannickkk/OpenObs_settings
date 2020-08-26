@@ -1,5 +1,8 @@
 library(shiny)
+library(shinyjs)
 library(data.table)
+
+jscode <- "shinyjs.closeWindow = function() { window.close(); }"
 
 ui <- fluidPage(
   sidebarLayout(
@@ -20,6 +23,7 @@ ui <- fluidPage(
       textInput("titre_onglet1","Intitulé de l'onglet de visualisation des données", value = "Données visuelles", width = NULL, placeholder = NULL),
       textInput("titre_onglet2","Intitulé de l'onglet de spatialisation des données", value = "Données spatiales", width = NULL, placeholder = NULL),
       textInput("titre_onglet3","Intitulé de l'onglet d'informations des espèces", value = "Informations des espèces", width = NULL, placeholder = NULL),
+      textInput("titre_onglet4","Intitulé de l'onglet du protocole", value = "Protocole", width = NULL, placeholder = NULL),
       textInput("label1_select_2", "Intitulé du label de trie subset_1", value = "subset_1", width = NULL, placeholder = NULL),
       textInput("label2_select_2", "Intitulé du label de trie subset_2", value = "subset_2", width = NULL, placeholder = NULL),
       textInput("label3_select_2", "Intitulé du label de trie subset_3", value = "subset_3", width = NULL, placeholder = NULL),
@@ -72,7 +76,9 @@ ui <- fluidPage(
       textInput("colors_pie_2","Code couleur utilisé pour pie_2",value = "", width = NULL, placeholder = NULL),
       textInput("colors_pie_3","Code couleur utilisé pour pie_3",value = "", width = NULL, placeholder = NULL),
       textInput("colors_pie_4","Code couleur utilisé pour pie_4",value = "", width = NULL, placeholder = NULL),
-      actionButton("submit","Créer la configuration"),
+      useShinyjs(),
+      extendShinyjs(text = jscode, functions = c("closeWindow")),
+      actionButton("submit","Lancer la configuration")
      
   
     ),
@@ -104,7 +110,8 @@ server <- function(input, output) {
   observeEvent(input$submit, {
     write.csv(c(input$titre_fenetre,input$logo,input$logo_lien,
                 input$titre_onglet1,input$titre_onglet2,
-                input$titre_onglet3,input$label1_select_2,
+                input$titre_onglet3,input$titre_onglet4,
+                input$label1_select_2,
                 input$label2_select_2,input$label3_select_2,
                 input$label4_select_2,input$label_checkbox_1,
                 input$label_checkbox_2,input$label1_pie_1,
@@ -127,10 +134,14 @@ server <- function(input, output) {
                 input$pie_width_1,input$pie_width_2,input$pie_width_3,
                 input$pie_width_4,input$own_colors,input$colors_pie_1,
                 input$colors_pie_2,input$colors_pie_3,input$colors_pie_4),
-              "../OpenObs_2/données/settings.csv")
-    write.csv(as.data.frame(fread(inFile$datapath, header = input$header)),paste0("../OpenObs_2/données/",paste0(paste0("data_",input$nom_fichier),".csv")))
-  })
+              "../OpenObs_2/donnees/settings.csv")
+    write.csv(as.data.frame(fread(inFile$datapath, header = input$header)),paste0("../OpenObs_2/donnees/",paste0(paste0("data_",input$nom_fichier),".csv")))
 
+    js$closeWindow()
+    rstudioapi::jobRunScript(path = "../OpenObs_2/scripts/runApp.R")
+    stopApp()
+    
+  })
 
 }
 
