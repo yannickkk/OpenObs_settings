@@ -133,7 +133,8 @@ server <- function(input, output) {
                 input$color_couche_4,input$fillOpacity_couche_4,
                 input$pie_width_1,input$pie_width_2,input$pie_width_3,
                 input$pie_width_4,input$own_colors,input$colors_pie_1,
-                input$colors_pie_2,input$colors_pie_3,input$colors_pie_4),
+                input$colors_pie_2,input$colors_pie_3,input$colors_pie_4,
+                input$nom_fichier),
               "../OpenObs_2/donnees/settings.csv")
     write.csv(as.data.frame(fread(inFile$datapath, header = input$header)),paste0("../OpenObs_2/donnees/",paste0(paste0("data_",input$nom_fichier),".csv")))
 
